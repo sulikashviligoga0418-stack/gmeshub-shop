@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingBag, Globe, Menu, X, BookOpen, GraduationCap, ArrowRight, Star, Hash, ShoppingCart, ExternalLink, Zap, Moon, Sun } from 'lucide-react';
 

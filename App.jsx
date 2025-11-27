@@ -143,6 +143,7 @@ const productsData = [
 
 export default function App() {
   const [lang, setLang] = useState('EN'); 
+  // Dark Mode State - ამოწმებს კომპიუტერის პარამეტრებს, ან default არის false (Light)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
@@ -157,6 +158,7 @@ export default function App() {
 
   const t = translations[lang];
 
+  // Dark Mode ეფექტი
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -165,6 +167,7 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // ფილტრაციის ლოგიკა
   useEffect(() => {
     const filtered = productsData.filter(product => {
       const catMatch = activeCategory === 'All' || 
@@ -183,12 +186,14 @@ export default function App() {
   }, [activeCategory, searchQuery, lang]);
 
   return (
+    // მთავარი კონტეინერი: bg-gray-100 (ღია ნაცრისფერი დღეს) და dark:bg-slate-900 (მუქი ღამით)
     <div className={`min-h-screen font-sans flex flex-col transition-colors duration-300 ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
       
       {/* --- HEADER --- */}
       <header className={`sticky top-0 z-50 shadow-md transition-colors duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white/90 backdrop-blur-md border-gray-100'}`}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           
+          {/* ლოგო */}
           <div className="flex items-center space-x-2 cursor-pointer" onClick={() => {setSearchQuery(''); setActiveCategory('All')}}>
             <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
               <ShoppingBag className="text-white" size={24} />
@@ -198,6 +203,7 @@ export default function App() {
             </span>
           </div>
 
+          {/* მენიუ (Desktop) */}
           <nav className="hidden md:flex space-x-8 items-center">
             <a href="#" className={`font-bold border-b-2 pb-1 transition-colors ${isDarkMode ? 'text-indigo-400 border-indigo-400' : 'text-indigo-600 border-indigo-600'}`}>
               {t.navShop}
@@ -210,15 +216,19 @@ export default function App() {
             </a>
           </nav>
 
+          {/* მარჯვენა მხარე: ენა, Dark Mode, მენიუ */}
           <div className="flex items-center space-x-3">
             
+            {/* Dark Mode Toggle */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className={`p-2 rounded-full transition-all duration-300 ${isDarkMode ? 'bg-slate-700 text-yellow-400 hover:bg-slate-600' : 'bg-gray-100 text-slate-700 hover:bg-gray-200'}`}
+              aria-label="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
+            {/* Language Switcher */}
             <div className={`hidden md:flex items-center space-x-1 px-2 py-1.5 rounded-full text-xs font-bold ${isDarkMode ? 'bg-slate-700' : 'bg-gray-100 border border-gray-200'}`}>
               <Globe size={14} className={`ml-1 mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}/>
               {['EN', 'IT', 'GE', 'RU'].map((l) => (
@@ -234,12 +244,14 @@ export default function App() {
               ))}
             </div>
 
+            {/* Mobile Menu Button */}
             <button className={`md:hidden p-2 rounded-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
 
+        {/* მობილური მენიუ (Dropdown) */}
         {isMenuOpen && (
           <div className={`md:hidden border-t p-4 space-y-4 shadow-xl absolute w-full z-50 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'}`}>
             <div className="flex justify-center space-x-2 pb-4 border-b border-gray-200/20">
@@ -261,10 +273,14 @@ export default function App() {
 
       {/* --- HERO SECTION --- */}
       <div className="relative py-20 px-4 text-center overflow-hidden">
+        {/* დინამიური ფონი */}
         <div className={`absolute inset-0 transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900'}`}></div>
         
+        {/* ორნამენტები */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-        
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500 rounded-full blur-[100px] opacity-30"></div>
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500 rounded-full blur-[100px] opacity-30"></div>
+
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow-sm">
             {t.heroTitle}
@@ -273,6 +289,7 @@ export default function App() {
             {t.heroSub}
           </p>
 
+          {/* ძებნის ველი */}
           <div className={`p-2 rounded-2xl shadow-2xl max-w-xl mx-auto flex items-center transform transition-all hover:scale-[1.01] ${isDarkMode ? 'bg-slate-800/80 backdrop-blur border border-slate-700' : 'bg-white'}`}>
             <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
               <Search size={24} />
@@ -293,9 +310,10 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- CONTENT --- */}
+      {/* --- მთავარი კონტენტი --- */}
       <div className="max-w-7xl mx-auto px-4 py-12 w-full flex-grow">
         
+        {/* ფილტრები */}
         <div className="flex justify-center space-x-3 overflow-x-auto pb-8 mb-4 no-scrollbar">
           {['All', 'Tech', 'Home'].map((cat) => (
              <button
@@ -314,6 +332,7 @@ export default function App() {
           ))}
         </div>
 
+        {/* პროდუქტების ბადე (GRID) */}
         {filteredProducts.length === 0 ? (
             <div className={`text-center py-24 rounded-3xl border border-dashed ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-300'}`}>
               <ShoppingBag size={64} className={`mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-gray-300'}`}/>
@@ -324,24 +343,30 @@ export default function App() {
             {filteredProducts.map((product) => (
               <div key={product.id} className={`rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border group flex flex-col h-full relative overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'bg-white border-gray-100 hover:border-indigo-100'}`}>
                 
+                {/* მარკერი */}
                 <div className={`absolute top-0 right-0 z-10 px-4 py-1.5 rounded-bl-2xl text-xs font-bold text-white shadow-md flex items-center gap-1.5
                   ${product.type === 'dropshipping' ? 'bg-emerald-500' : 'bg-gray-800'}`}>
                   {product.type === 'dropshipping' ? <Zap size={12}/> : <ExternalLink size={12}/>}
                   {product.type === 'dropshipping' ? t.badgeDirect : t.badgeAffiliate}
                 </div>
 
+                {/* სურათი & კოდი */}
                 <div className="relative aspect-[4/3] overflow-hidden">
+                  <div className="absolute inset-0 bg-gray-200 animate-pulse"></div> {/* Placeholder */}
                   <img 
                     src={product.image} 
                     alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="relative w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    loading="lazy"
                   />
+                  {/* კოდის ნიშანი */}
                   <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg border border-white/10">
                     <Hash size={14} className="text-yellow-400"/> 
                     <span className="tracking-wider">{product.code}</span>
                   </div>
                 </div>
 
+                {/* ინფორმაცია */}
                 <div className="p-5 flex-1 flex flex-col">
                   <div className="flex justify-between items-center mb-3">
                       <span className={`text-[10px] font-extrabold uppercase tracking-widest px-2 py-1 rounded-md ${isDarkMode ? 'bg-slate-700 text-indigo-300' : 'bg-indigo-50 text-indigo-600'}`}>
@@ -359,6 +384,7 @@ export default function App() {
                   <div className={`mt-auto pt-5 flex items-center justify-between border-t ${isDarkMode ? 'border-slate-700' : 'border-gray-100'}`}>
                       <span className={`text-2xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{product.price}</span>
                       
+                      {/* ღილაკი */}
                       <a 
                         href={product.link} 
                         target="_blank" 
@@ -380,14 +406,22 @@ export default function App() {
         )}
       </div>
 
+      {/* --- FOOTER --- */}
       <footer className={`border-t py-12 mt-auto text-center text-sm transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800 text-gray-500' : 'bg-white border-gray-100 text-gray-500'}`}>
         <div className="flex justify-center items-center gap-2 mb-6">
-          <ShoppingBag className="text-indigo-600" size={20} />
+          <div className="bg-indigo-600 p-1.5 rounded-lg">
+             <ShoppingBag className="text-white" size={18} />
+          </div>
           <span className={`font-bold text-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
             GMES<span className="text-indigo-500">HUB</span>
           </span>
         </div>
         <p className="mb-8 max-w-md mx-auto opacity-80">{t.footerText}</p>
+        <div className="flex justify-center gap-6 mb-8 text-xs font-bold uppercase tracking-widest opacity-60">
+          <a href="#" className="hover:text-indigo-500 transition">Privacy</a>
+          <a href="#" className="hover:text-indigo-500 transition">Terms</a>
+          <a href="#" className="hover:text-indigo-500 transition">Contact</a>
+        </div>
         <p className="opacity-40">© 2024 GMESHUB. All Rights Reserved.</p>
       </footer>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Globe, Menu, X, BookOpen, GraduationCap, ArrowRight, Star, Hash, ShoppingCart, ExternalLink, Zap } from 'lucide-react';
+import { Search, ShoppingBag, Globe, Menu, X, BookOpen, GraduationCap, ArrowRight, Star, Hash, ShoppingCart, ExternalLink, Zap, Moon, Sun } from 'lucide-react';
 
 // --- ენების მონაცემები (EN, IT, GE, RU) ---
 const translations = {
@@ -143,12 +143,27 @@ const productsData = [
 
 export default function App() {
   const [lang, setLang] = useState('EN'); 
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return true;
+    }
+    return false;
+  });
+
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(productsData);
 
   const t = translations[lang];
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     const filtered = productsData.filter(product => {
@@ -168,137 +183,194 @@ export default function App() {
   }, [activeCategory, searchQuery, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+    <div className={`min-h-screen font-sans flex flex-col transition-colors duration-300 ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
+      
+      {/* --- HEADER --- */}
+      <header className={`sticky top-0 z-50 shadow-md transition-colors duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white/90 backdrop-blur-md border-gray-100'}`}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          
           <div className="flex items-center space-x-2 cursor-pointer" onClick={() => {setSearchQuery(''); setActiveCategory('All')}}>
-            <div className="bg-indigo-600 p-2 rounded-lg">
+            <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
               <ShoppingBag className="text-white" size={24} />
             </div>
-            <span className="text-xl font-bold tracking-tight">GMES<span className="text-indigo-600">HUB</span></span>
+            <span className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              GMES<span className="text-indigo-500">HUB</span>
+            </span>
           </div>
+
           <nav className="hidden md:flex space-x-8 items-center">
-            <a href="#" className="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1">{t.navShop}</a>
-            <a href="#" className="text-gray-500 hover:text-indigo-600 transition flex items-center gap-1">
-              <GraduationCap size={16}/> {t.navCourses}
+            <a href="#" className={`font-bold border-b-2 pb-1 transition-colors ${isDarkMode ? 'text-indigo-400 border-indigo-400' : 'text-indigo-600 border-indigo-600'}`}>
+              {t.navShop}
             </a>
-            <a href="#" className="text-gray-500 hover:text-indigo-600 transition flex items-center gap-1">
-              <BookOpen size={16}/> {t.navBlog}
+            <a href="#" className={`transition flex items-center gap-1 font-medium ${isDarkMode ? 'text-gray-400 hover:text-indigo-400' : 'text-gray-500 hover:text-indigo-600'}`}>
+              <GraduationCap size={18}/> {t.navCourses}
+            </a>
+            <a href="#" className={`transition flex items-center gap-1 font-medium ${isDarkMode ? 'text-gray-400 hover:text-indigo-400' : 'text-gray-500 hover:text-indigo-600'}`}>
+              <BookOpen size={18}/> {t.navBlog}
             </a>
           </nav>
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-full text-sm font-medium">
-              <Globe size={14} className="text-gray-500 ml-1 mr-1"/>
+
+          <div className="flex items-center space-x-3">
+            
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`p-2 rounded-full transition-all duration-300 ${isDarkMode ? 'bg-slate-700 text-yellow-400 hover:bg-slate-600' : 'bg-gray-100 text-slate-700 hover:bg-gray-200'}`}
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
+            <div className={`hidden md:flex items-center space-x-1 px-2 py-1.5 rounded-full text-xs font-bold ${isDarkMode ? 'bg-slate-700' : 'bg-gray-100 border border-gray-200'}`}>
+              <Globe size={14} className={`ml-1 mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}/>
               {['EN', 'IT', 'GE', 'RU'].map((l) => (
                 <button 
                   key={l} 
                   onClick={() => setLang(l)}
-                  className={`px-2 py-1 rounded-md transition text-xs ${lang === l ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                  className={`px-2 py-1 rounded-md transition ${lang === l 
+                    ? (isDarkMode ? 'bg-slate-600 text-white shadow' : 'bg-white text-indigo-600 shadow-sm') 
+                    : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900')}`}
                 >
                   {l}
                 </button>
               ))}
             </div>
-            <button className="md:hidden text-gray-700" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+
+            <button className={`md:hidden p-2 rounded-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
+
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t p-4 space-y-4 shadow-lg absolute w-full z-50">
-            <div className="flex justify-center space-x-2 pb-4 border-b">
+          <div className={`md:hidden border-t p-4 space-y-4 shadow-xl absolute w-full z-50 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'}`}>
+            <div className="flex justify-center space-x-2 pb-4 border-b border-gray-200/20">
                {['EN', 'IT', 'GE', 'RU'].map((l) => (
-                <button key={l} onClick={() => {setLang(l); setIsMenuOpen(false)}} className={`px-3 py-2 rounded-lg font-bold ${lang === l ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-600'}`}>
+                <button key={l} onClick={() => {setLang(l); setIsMenuOpen(false)}} 
+                  className={`px-3 py-2 rounded-lg font-bold ${lang === l 
+                    ? 'bg-indigo-600 text-white' 
+                    : (isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-100 text-gray-600')}`}>
                   {l}
                 </button>
               ))}
             </div>
-            <a href="#" className="block text-lg font-medium text-indigo-600">{t.navShop}</a>
-            <a href="#" className="block text-lg font-medium text-gray-500">{t.navCourses}</a>
-            <a href="#" className="block text-lg font-medium text-gray-500">{t.navBlog}</a>
+            <a href="#" className="block text-lg font-medium text-indigo-500">{t.navShop}</a>
+            <a href="#" className={`block text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>{t.navCourses}</a>
+            <a href="#" className={`block text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>{t.navBlog}</a>
           </div>
         )}
       </header>
-      <div className="bg-indigo-900 text-white py-16 px-4 text-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">{t.heroTitle}</h1>
-          <p className="text-indigo-200 text-lg mb-8">{t.heroSub}</p>
-          <div className="bg-white p-2 rounded-2xl shadow-xl max-w-xl mx-auto flex items-center transform transition-all hover:scale-[1.01]">
-            <div className="bg-gray-100 p-3 rounded-xl text-gray-500"><Search size={24} /></div>
+
+      {/* --- HERO SECTION --- */}
+      <div className="relative py-20 px-4 text-center overflow-hidden">
+        <div className={`absolute inset-0 transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900'}`}></div>
+        
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow-sm">
+            {t.heroTitle}
+          </h1>
+          <p className="text-indigo-100 text-lg md:text-xl mb-10 font-medium opacity-90">
+            {t.heroSub}
+          </p>
+
+          <div className={`p-2 rounded-2xl shadow-2xl max-w-xl mx-auto flex items-center transform transition-all hover:scale-[1.01] ${isDarkMode ? 'bg-slate-800/80 backdrop-blur border border-slate-700' : 'bg-white'}`}>
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+              <Search size={24} />
+            </div>
             <input 
               type="text" 
               placeholder={t.searchPlaceholder} 
-              className="flex-1 bg-transparent border-none outline-none text-gray-800 text-lg px-4 placeholder-gray-400 h-12"
+              className={`flex-1 bg-transparent border-none outline-none text-lg px-4 h-12 ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400'}`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {searchQuery && <button onClick={() => setSearchQuery('')} className="p-2 text-gray-400 hover:text-red-500"><X size={20}/></button>}
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="p-2 text-gray-400 hover:text-red-500 transition">
+                <X size={20}/>
+              </button>
+            )}
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
-        <div className="flex justify-center space-x-2 overflow-x-auto pb-6 mb-2 no-scrollbar">
+
+      {/* --- CONTENT --- */}
+      <div className="max-w-7xl mx-auto px-4 py-12 w-full flex-grow">
+        
+        <div className="flex justify-center space-x-3 overflow-x-auto pb-8 mb-4 no-scrollbar">
           {['All', 'Tech', 'Home'].map((cat) => (
              <button
              key={cat}
              onClick={() => setActiveCategory(cat)}
-             className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
-               activeCategory === cat ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+             className={`px-8 py-2.5 rounded-full font-bold whitespace-nowrap transition-all duration-200 transform hover:-translate-y-0.5 ${
+               activeCategory === cat 
+                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/40' 
+                 : (isDarkMode 
+                      ? 'bg-slate-800 text-gray-300 border border-slate-700 hover:bg-slate-700' 
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-white hover:shadow-md')
              }`}
            >
              {cat === 'All' ? t.filterAll : cat === 'Tech' ? t.filterTech : t.filterHome}
            </button>
           ))}
         </div>
+
         {filteredProducts.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-              <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4"/>
-              <p className="text-gray-500 text-lg">{t.noResult}</p>
+            <div className={`text-center py-24 rounded-3xl border border-dashed ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-300'}`}>
+              <ShoppingBag size={64} className={`mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-gray-300'}`}/>
+              <p className={`text-xl font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t.noResult}</p>
             </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 group flex flex-col h-full relative overflow-hidden">
-                <div className={`absolute top-0 right-0 z-10 px-3 py-1 rounded-bl-xl text-xs font-bold text-white shadow-sm flex items-center gap-1
-                  ${product.type === 'dropshipping' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gray-800'}`}>
+              <div key={product.id} className={`rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border group flex flex-col h-full relative overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'bg-white border-gray-100 hover:border-indigo-100'}`}>
+                
+                <div className={`absolute top-0 right-0 z-10 px-4 py-1.5 rounded-bl-2xl text-xs font-bold text-white shadow-md flex items-center gap-1.5
+                  ${product.type === 'dropshipping' ? 'bg-emerald-500' : 'bg-gray-800'}`}>
                   {product.type === 'dropshipping' ? <Zap size={12}/> : <ExternalLink size={12}/>}
                   {product.type === 'dropshipping' ? t.badgeDirect : t.badgeAffiliate}
                 </div>
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img 
                     src={product.image} 
                     alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white text-sm font-bold px-3 py-1 rounded-md flex items-center gap-1 shadow-lg border border-white/20">
-                    <Hash size={14} className="text-yellow-400"/> {product.code}
+                  <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg border border-white/10">
+                    <Hash size={14} className="text-yellow-400"/> 
+                    <span className="tracking-wider">{product.code}</span>
                   </div>
                 </div>
-                <div className="p-4 flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{product.category}</span>
-                      <div className="flex items-center text-yellow-500 text-xs font-bold">
+
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="flex justify-between items-center mb-3">
+                      <span className={`text-[10px] font-extrabold uppercase tracking-widest px-2 py-1 rounded-md ${isDarkMode ? 'bg-slate-700 text-indigo-300' : 'bg-indigo-50 text-indigo-600'}`}>
+                        {product.category}
+                      </span>
+                      <div className="flex items-center text-yellow-500 text-xs font-bold bg-yellow-400/10 px-2 py-1 rounded-full">
                         <Star size={12} fill="currentColor" className="mr-1"/> {product.rating}
                       </div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 leading-snug mb-3 line-clamp-2">
+
+                  <h3 className={`text-lg font-bold leading-tight mb-4 line-clamp-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                     {lang === 'IT' && product.titleIT ? product.titleIT : product.title}
                   </h3>
-                  <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
-                      <span className="text-xl font-bold text-gray-900">{product.price}</span>
+                  
+                  <div className={`mt-auto pt-5 flex items-center justify-between border-t ${isDarkMode ? 'border-slate-700' : 'border-gray-100'}`}>
+                      <span className={`text-2xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{product.price}</span>
+                      
                       <a 
                         href={product.link} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2 shadow-sm
+                        className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all transform active:scale-95 flex items-center gap-2 shadow-lg
                           ${product.type === 'dropshipping' 
-                            ? 'bg-green-500 hover:bg-green-600 text-white' 
-                            : 'bg-yellow-400 hover:bg-yellow-500 text-black'}`}
+                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30' 
+                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30'}`}
                       >
                         {product.type === 'dropshipping' 
-                          ? <><ShoppingCart size={16}/> {t.btnDirect}</> 
-                          : <>{t.btnAmazon} <ArrowRight size={16}/></>}
+                          ? <><ShoppingCart size={18}/> {t.btnDirect}</> 
+                          : <>{t.btnAmazon} <ArrowRight size={18}/></>}
                       </a>
                   </div>
                 </div>
@@ -307,18 +379,16 @@ export default function App() {
           </div>
         )}
       </div>
-      <footer className="bg-white border-t mt-auto py-8 text-center text-gray-500 text-sm">
-        <div className="flex justify-center items-center gap-2 mb-4">
+
+      <footer className={`border-t py-12 mt-auto text-center text-sm transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800 text-gray-500' : 'bg-white border-gray-100 text-gray-500'}`}>
+        <div className="flex justify-center items-center gap-2 mb-6">
           <ShoppingBag className="text-indigo-600" size={20} />
-          <span className="font-bold text-gray-800">GMES<span className="text-indigo-600">HUB</span></span>
+          <span className={`font-bold text-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+            GMES<span className="text-indigo-500">HUB</span>
+          </span>
         </div>
-        <p className="mb-6 max-w-md mx-auto">{t.footerText}</p>
-        <div className="flex justify-center gap-4 mb-4 text-xs uppercase tracking-wide">
-          <a href="#" className="hover:text-indigo-600">Privacy Policy</a>
-          <a href="#" className="hover:text-indigo-600">Terms</a>
-          <a href="#" className="hover:text-indigo-600">Contact</a>
-        </div>
-        <p>© 2024 GMESHUB. All Rights Reserved.</p>
+        <p className="mb-8 max-w-md mx-auto opacity-80">{t.footerText}</p>
+        <p className="opacity-40">© 2024 GMESHUB. All Rights Reserved.</p>
       </footer>
     </div>
   );
